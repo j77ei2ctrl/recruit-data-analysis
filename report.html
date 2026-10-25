@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>大数据招聘岗位数据分析 · 完整报告</title>
+<style>
+:root{--bg:#0f172a;--panel:#1e293b;--ink:#e2e8f0;--muted:#94a3b8;--blue:#60a5fa;--line:#334155;--amber:#f59e0b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);line-height:1.85;
+  font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;font-size:16px}
+.topbar{position:sticky;top:0;z-index:20;background:rgba(15,23,42,.9);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line)}
+.topbar .in{max-width:1180px;margin:0 auto;padding:0 24px;height:58px;display:flex;align-items:center;
+  justify-content:space-between;gap:16px}
+.topbar b{font-size:14.5px}
+.topbar a{color:var(--muted);text-decoration:none;font-size:13.5px;padding:6px 11px;border-radius:8px}
+.topbar a:hover{color:var(--ink);background:var(--panel)}
+.layout{max-width:1180px;margin:0 auto;padding:32px 24px 80px;display:flex;gap:40px;align-items:flex-start}
+aside{position:sticky;top:82px;width:216px;flex:0 0 216px;border-left:2px solid var(--line);padding-left:16px}
+aside p{font-size:12px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;margin-bottom:10px}
+aside a{display:block;color:var(--muted);text-decoration:none;font-size:13.5px;padding:4px 0}
+aside a:hover{color:var(--blue)}
+article{flex:1;min-width:0;max-width:820px}
+h2{font-size:25px;line-height:1.4;margin:56px 0 18px;padding-bottom:12px;border-bottom:1px solid var(--line);
+  scroll-margin-top:80px;letter-spacing:-.01em}
+h2:first-child{margin-top:0}
+h3{font-size:18.5px;margin:34px 0 12px;color:var(--blue);scroll-margin-top:80px}
+p{margin:0 0 16px;color:#cbd5e1}
+strong{color:#fff;font-weight:600}
+a{color:var(--blue)}
+ul,ol{margin:0 0 18px;padding-left:24px;color:#cbd5e1}
+li{margin-bottom:7px}
+blockquote{margin:0 0 20px;padding:14px 18px;border-left:3px solid var(--amber);
+  background:rgba(245,158,11,.07);border-radius:0 10px 10px 0;color:#e8d9bd;font-size:15px}
+blockquote p{margin:0;color:inherit}
+code{background:#0b1220;border:1px solid var(--line);border-radius:5px;padding:1px 6px;
+  font-family:"JetBrains Mono",Consolas,monospace;font-size:13.5px;color:#93c5fd}
+pre{background:#0b1220;border:1px solid var(--line);border-radius:12px;padding:18px;overflow-x:auto;margin:0 0 22px}
+pre code{background:none;border:none;padding:0;color:#cbd5e1;font-size:13px;line-height:1.7}
+table{width:100%;border-collapse:collapse;margin:0 0 24px;font-size:14px;table-layout:fixed}
+th{background:#16213a;color:#fff;font-weight:600;text-align:left;padding:10px 12px;border:1px solid var(--line)}
+td{padding:9px 12px;border:1px solid var(--line);color:#cbd5e1;vertical-align:top;word-break:break-word}
+tbody tr:nth-child(even){background:rgba(30,41,59,.45)}
+figure{margin:24px 0 26px;text-align:center}
+figure img{width:100%;border-radius:12px;border:1px solid var(--line);background:#fff}
+figcaption{font-size:13px;color:var(--muted);margin-top:9px}
+img{max-width:100%}
+hr{border:none;border-top:1px solid var(--line);margin:44px 0}
+.foot{max-width:1180px;margin:0 auto;padding:0 24px 60px;color:var(--muted);font-size:13px}
+@media(max-width:900px){.layout{flex-direction:column;padding:22px 18px 60px}aside{display:none}table{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="in">
+  <b>大数据招聘岗位数据分析</b>
+  <span><a href="index.html">← 可视化作品集</a><a href="README.md">仓库首页</a></span>
+</div></div>
+
+<div class="layout">
+  <aside>
+    <p>本页导航</p>
+    <a href="#目录">目录</a><a href="#1-项目概述">1 项目概述</a><a href="#2-数据源与采集方案">2 数据源与采集方案</a><a href="#3-数据预处理与清洗">3 数据预处理与清洗</a><a href="#4-探索性数据分析">4 探索性数据分析</a><a href="#5-业务结论与项目价值">5 业务结论与项目价值</a><a href="#6-项目总结局限性后续可优化方向">6 项目总结、局限性、后续可优化方向</a><a href="#附录如何复现">附录：如何复现</a>
+  </aside>
+  <article>
+    <blockquote><strong>一句话</strong>：用 14,725 条招聘数据，回答一个具体问题——一名大数据技术专业的专科应届生，应当优先补齐哪些技能、投递哪些岗位方向、选择哪些城市。</blockquote>
+<p align="center">
+  <img src="images/fig1_salary_box.png" width="100%" alt="各技术方向月薪分布箱线图">
+</p>
+<p><strong>数据规模</strong> 14,725 条 · <strong>覆盖</strong> 70 类岗位 / 179 座城市 / 6,700 家企业 · <strong>时间跨度</strong> 2022.08–2024.01</p>
+<p><strong>技术栈</strong> Python · pandas · NumPy · 正则表达式 · matplotlib · 原生 SVG</p>
+<hr>
+<h2 id="目录">目录</h2>
+<table><colgroup><col style="width:59.1%"><col style="width:40.9%"></colgroup><thead><tr><th>章节</th><th>内容</th></tr></thead><tbody>
+<tr><td><a href="#1-项目概述">1 项目概述</a></td><td>背景、五个业务目标、技术链路、核心发现速览</td></tr>
+<tr><td><a href="#2-数据源与采集方案">2 数据源与采集方案</a></td><td>数据来源、字段构成、样本偏差的前置说明</td></tr>
+<tr><td><a href="#3-数据预处理与清洗">3 数据预处理与清洗</a></td><td>8 步清洗、异常值语义化处理、去重验证、技能抽取</td></tr>
+<tr><td><a href="#4-探索性数据分析">4 探索性数据分析</a></td><td>四层分析框架 + 4 张业务图表</td></tr>
+<tr><td><a href="#5-业务结论与项目价值">5 业务结论与项目价值</a></td><td>4 条可执行结论、方法价值</td></tr>
+<tr><td><a href="#6-项目总结局限性后续可优化方向">6 项目总结、局限性、后续可优化方向</a></td><td>总结、8 项局限、4 个优化方向、复现说明</td></tr>
+</tbody></table>
+<blockquote>图表说明：报告中的 4 张图均为<strong>原生 SVG 手绘</strong>（<code>index.html</code>，离线可用、无 CDN 依赖）， PNG 版本由 headless 浏览器渲染导出，放在 <code>images/</code>。</blockquote>
+<hr>
+<h2 id="1-项目概述">1 项目概述</h2>
+<p>本章交代项目为什么做、要做成什么、用什么方法做，以及最终得到了什么。如果只有一分钟，可以直接看 1.4 节的核心发现速览。</p>
+<h3 id="11-项目背景">1.1 项目背景</h3>
+<p>大数据技术专业的学生在求职季普遍会遇到一个尴尬：课本上学的技术栈（Hadoop、Hive、Spark、Flink）到底哪些是企业真正在用的？学完这些能不能直接找到对口岗位？如果不能，应该先从哪里进入行业？</p>
+<p>这类问题的答案通常来自三种渠道：学长学姐的个人经验、招聘网站上的零散岗位描述、以及培训机构的招生话术。前两者样本太小，后者立场不中立。而招聘信息本身恰恰是一份<strong>大样本、可量化、且由企业用真实薪资预算投票产生</strong>的需求数据——每一行岗位描述，都是企业在说"我愿意为具备这些能力的人付这个价钱"。</p>
+<p>本项目因此把问题定义为：<strong>用招聘市场的公开数据，回答"一名大数据技术专业的专科应届生，应当优先补齐哪些技能、投递哪些岗位方向、选择哪些城市"。</strong></p>
+<p>这个问题的价值不在于"分析数据"，而在于它输出的是一条<strong>可执行的投递策略</strong>。项目结论直接改变了我的求职计划：原本准备毕业就投"大数据开发工程师"，现在改为先投数据运维、ETL、后端开发等技能相邻的岗位，积累 1–2 年真实数据项目经验后再转岗。这个转变不是凭感觉，而是第四章那个"只剩 5 个岗位"的漏斗算出来的。</p>
+<h3 id="12-业务目标">1.2 业务目标</h3>
+<p>项目设定了五个可验证的业务目标，每一条都对应一个具体的决策场景：</p>
+<table><colgroup><col style="width:10.3%"><col style="width:35.0%"><col style="width:22.7%"><col style="width:32.0%"></colgroup><thead><tr><th>编号</th><th>业务目标</th><th>对应决策</th><th>检验方式</th></tr></thead><tbody>
+<tr><td>G1</td><td>测算大数据方向相对其他技术方向的薪资溢价</td><td>这个方向值不值得选</td><td>各岗位方向薪资中位数对比</td></tr>
+<tr><td>G2</td><td>找出大数据岗的"区分性技能要求"</td><td>优先学什么、哪些是及格线</td><td>大数据岗命中率与全体技术岗之差</td></tr>
+<tr><td>G3</td><td>评估技能是否真的带来薪资回报</td><td>会不会白学</td><td>控制城市与工龄后的技能溢价</td></tr>
+<tr><td>G4</td><td>量化"薪资—学历门槛"的城市权衡</td><td>去哪座城市投递</td><td>城市二维对比（薪资 × 大专可投率）</td></tr>
+<tr><td>G5</td><td>测算专科学历叠加应届身份后的真实机会量</td><td>第一份工作怎么进</td><td>三重条件叠加漏斗</td></tr>
+</tbody></table>
+<p>五个目标构成一条完整的决策链：先确认方向有价值（G1），再确认要补什么能力（G2、G3），再确认去哪里投（G4），最后确认第一份工作怎么切入（G5）。</p>
+<h3 id="13-技术链路与工具">1.3 技术链路与工具</h3>
+<p>项目采用标准的数据分析链路，每个环节的产物都可追溯：</p>
+<table><colgroup><col style="width:11.1%"><col style="width:44.4%"><col style="width:44.4%"></colgroup><thead><tr><th>环节</th><th>主要工作</th><th>工具</th></tr></thead><tbody>
+<tr><td>数据获取</td><td>获取公开招聘数据集，核对字段与样本结构</td><td>和鲸社区数据集</td></tr>
+<tr><td>数据清洗</td><td>文本去标签、薪资结构化、去重、缺失值分级、类型转换、衍生字段</td><td>Python 3 / pandas / NumPy / re</td></tr>
+<tr><td>探索性分析</td><td>描述统计、分组统计、交叉表、分层控制、敏感性检验</td><td>pandas</td></tr>
+<tr><td>可视化</td><td>4 张图表，覆盖方向、技能、城市、机会量四个维度</td><td>matplotlib（同款原生 SVG 版本用于网页）</td></tr>
+<tr><td>结论输出</td><td>业务结论、投递清单、局限性说明</td><td>报告 + 作品集页面</td></tr>
+</tbody></table>
+<p>整条链路的代码量约 1,100 行，分为清洗脚本、EDA 脚本、图表数据脚本三个独立模块，可复现。</p>
+<h3 id="14-核心发现速览">1.4 核心发现速览</h3>
+<table><colgroup><col style="width:24.3%"><col style="width:39.1%"><col style="width:36.7%"></colgroup><thead><tr><th>指标</th><th>数值</th><th>说明</th></tr></thead><tbody>
+<tr><td>原始数据</td><td>21,320 条 × 21 列</td><td>拉勾招聘公开职位信息</td></tr>
+<tr><td>清洗后数据</td><td>14,725 条 × 59 列</td><td>删除重复与异常记录，新增 38 个衍生字段</td></tr>
+<tr><td>覆盖范围</td><td>70 类岗位 / 179 座城市 / 6,700 家企业</td><td>时间跨度 2022.08–2024.01</td></tr>
+<tr><td>全体技术岗薪资中位数</td><td>18.5 K/月</td><td>均值 21.3 K，分布右偏</td></tr>
+<tr><td>大数据岗薪资中位数</td><td>22.5 K/月</td><td>高于后端开发（19.0 K）与运维（15.0 K）</td></tr>
+<tr><td>大数据岗要求 Spark 的比例</td><td>40.4%</td><td>全体技术岗仅 2.7%，差值 +37.7 pp</td></tr>
+<tr><td>大数据岗要求本科学历的比例</td><td>88.2%</td><td>全体技术岗为 74.0%，高 14.2 pp</td></tr>
+<tr><td>大专 + 大数据 + 应届可投</td><td>5 个岗位</td><td>占全部技术岗的 0.03%</td></tr>
+<tr><td>技能溢价（控制混淆变量后）</td><td>Spark 为 −2.5 K</td><td>全样本口径 +6.5 K 的溢价主要来自方向而非技能</td></tr>
+</tbody></table>
+<p>最反直觉的一条在最后一行：<strong>"会 Spark"并不构成谈薪筹码</strong>。全样本看，要求 Spark 的岗位薪资高出 6.5 K（+35%）；但把城市等级和工龄固定住之后，这个差值反转为 −2.5 K。原因是高薪的那批岗位本身就是数据开发岗，而数据开发岗里 Spark 是标配而非稀缺项。这一点决定了结论二的表述方式——学 Spark 是为了<strong>进门</strong>，不是为了<strong>加价</strong>。</p>
+<h3 id="15-交付物">1.5 交付物</h3>
+<ul><li>数据清洗脚本（8 步，含日志）与清洗后数据集（14,725 行 × 59 列）</li><li>探索性分析脚本（4 层 20 张分析表）</li><li>4 张业务图表及其数据源（精确到每个箱线统计量、每个气泡坐标）</li><li>本报告与配套的可视化作品集页面</li></ul>
+<h2 id="2-数据源与采集方案">2 数据源与采集方案</h2>
+<p>本章说明数据从哪里来、包含哪些字段，以及在正式分析之前必须先讲清楚的一个前提——这份数据是被采样过的。这个前提决定了全文所有占比结论的表述方式。</p>
+<h3 id="21-数据来源">2.1 数据来源</h3>
+<p>本项目使用<strong>和鲸社区（Heywhale）公开的拉勾招聘数据集</strong>，原始文件为 CSV 格式，共 21,320 行、21 列，原始采集自拉勾网（lagou.com）公开职位列表页，发布时间覆盖 2022 年 8 月至 2024 年 1 月。</p>
+<p>选择公开数据集而非自行爬取，是一个经过权衡的决定，理由有三：</p>
+<ol><li><strong>合规性</strong>。招聘网站的用户协议通常禁止未经授权的自动化采集，且职位描述文本可能包含企业联系方式等非公开信息。个人项目使用公开数据集可以规避这一风险，同时便于他人复现。</li><li><strong>可复现性</strong>。作品集项目的价值之一是可被检验。使用公开数据集意味着面试官可以下载同一份数据、跑同一套脚本、得到同一个结论。</li><li><strong>伦理表述的准确性</strong>。使用公开数据，报告里就应当如实写"使用公开数据集"，而不能暗示"我爬取了 2 万条数据"。后者一旦被追问技术细节（反爬策略、IP 池、请求频率控制）就会露馅，反而扣分。</li></ol>
+<h3 id="22-字段构成">2.2 字段构成</h3>
+<p>原始 21 个字段可分为四组：</p>
+<table><colgroup><col style="width:11.3%"><col style="width:74.4%"><col style="width:14.2%"></colgroup><thead><tr><th>分组</th><th>字段</th><th>分析价值</th></tr></thead><tbody>
+<tr><td>标识类</td><td>id、positionId、companyId、create_at</td><td>去重键、关联键</td></tr>
+<tr><td>岗位描述类</td><td>positionName、category、bigcategory、positionType、jobNature</td><td>岗位方向归类、全职/实习筛选</td></tr>
+<tr><td>薪资与要求类</td><td>salary、city、district、education、workYear</td><td>核心分析变量</td></tr>
+<tr><td>企业与文本类</td><td>companyFullName、companySize、industryField、financeStage、positionDetail、positionAdvantage、createTime</td><td>混杂变量控制、技能抽取来源</td></tr>
+</tbody></table>
+<p>其中 <code>salary</code> 字段是字符串形式的区间（如"20k-35k"），<code>positionDetail</code> 是完整的职位描述富文本，这两个字段决定了后续清洗工作中最重的两块内容：<strong>薪资结构化</strong>与<strong>文本标签清洗后的技能抽取</strong>。</p>
+<h3 id="23-采集方案的一个关键前提这份数据是被采样过的">2.3 采集方案的一个关键前提：这份数据是被"采样"过的</h3>
+<p>在正式分析前，我先做了一次样本结构检查，结果直接改变了整份报告的所有占比表述方式。</p>
+<p><strong>发现</strong>：70 个岗位类别中，有 23 个（33%）的记录数超过 400 条，且集中在 440–450 一线；有 47 个（67%）超过 300 条。最大类别 C++ 有 450 条，最小类别"病毒分析"只有 2 条。而现实中 Java 的岗位量通常是 Perl 的几十倍，在这份数据里两者却几乎一样多。</p>
+<p><strong>结论</strong>：这份数据采用的是<strong>按类别封顶采样</strong>策略——每个类别最多采集约 450 条，热门类别被截断，冷门类别全量保留。</p>
+<p><strong>后果与应对</strong>：</p>
+<ul><li>凡涉及"某类岗位占市场的百分之几"的结论，一律不能成立。本报告中所有占比均表述为<strong>"样本内占比"</strong>，并在此处明确标注。</li><li>这个采样方式也有正面作用：它保证了小众方向（如大数据，582 条）拥有足够的样本量做内部比较，而这正是本项目需要的。</li><li>因此项目结论的适用范围被限定为<strong>"类别内部的技术要求与薪资结构"</strong>，而不是"市场需求规模排名"。这一条写进了第六章的局限性。</li></ul>
+<p>这一步是整个项目里最容易被忽略、也最容易被面试官挑出问题的地方，所以放在了方法的开头。</p>
+<h2 id="3-数据预处理与清洗">3 数据预处理与清洗</h2>
+<p>清洗决定了后面所有结论的可信度。本章按八个步骤记录每一步做了什么、为什么这么做，以及如何验证这一步做对了。</p>
+<h3 id="31-清洗总体情况">3.1 清洗总体情况</h3>
+<p>清洗分为 8 个步骤，每步的记录数变动都写入日志：</p>
+<table><colgroup><col style="width:10.0%"><col style="width:41.7%"><col style="width:19.1%"><col style="width:19.1%"><col style="width:10.0%"></colgroup><thead><tr><th>步骤</th><th>操作</th><th>记录数</th><th>变动</th><th>列数</th></tr></thead><tbody>
+<tr><td>1</td><td>读取原始 CSV</td><td>21,320</td><td>—</td><td>21</td></tr>
+<tr><td>2</td><td>剔除无用列</td><td>21,320</td><td>0</td><td>19</td></tr>
+<tr><td>3</td><td>HTML 标签清洗</td><td>21,320</td><td>0</td><td>19</td></tr>
+<tr><td>4</td><td>薪资结构化与异常剔除</td><td>21,305</td><td>−15</td><td>22</td></tr>
+<tr><td>5</td><td>按 positionId 去重</td><td>14,725</td><td>−6,580</td><td>22</td></tr>
+<tr><td>6</td><td>全字段去重</td><td>14,725</td><td>0</td><td>22</td></tr>
+<tr><td>7</td><td>剔除关键字段缺失</td><td>14,725</td><td>0</td><td>22</td></tr>
+<tr><td>8</td><td>描述字段填充</td><td>14,725</td><td>0</td><td>22</td></tr>
+<tr><td>9</td><td>类型转换与有序分类</td><td>14,725</td><td>0</td><td>25</td></tr>
+<tr><td>10</td><td>衍生字段构造</td><td>14,725</td><td>0</td><td>59</td></tr>
+</tbody></table>
+<p>最终得到 14,725 行 × 59 列的分析用数据。全文薪资分析基于其中有薪资记录的 14,422 条。</p>
+<h3 id="32-步骤一文本标签清洗">3.2 步骤一：文本标签清洗</h3>
+<p>原始数据中 <strong>99.6% 的职位描述（positionDetail）含 HTML 标签</strong>，主要是 <code>&lt;br /&gt;</code>、<code>&amp;nbsp;</code>、<code>&lt;p&gt;</code> 等富文本残留。这些标签会直接污染后续的关键词匹配——例如技能词"SQL"若被 <code>&lt;span&gt;SQL&lt;/span&gt;</code> 包裹，简单的字符串查找仍能命中，但换行符和实体字符会导致跨词匹配出错。</p>
+<p>处理方式是统一用正则剥离标签并还原实体字符，同时把连续空白压缩为单个空格。<code>positionAdvantage</code>（福利标签）做同样处理。</p>
+<p>这一步虽然记录数不变，但它决定了后续技能抽取的准确率，是整条链路里"不做就会全错"的一步。</p>
+<h3 id="33-步骤二薪资结构化与异常的语义化处理">3.3 步骤二：薪资结构化与异常的语义化处理</h3>
+<p><code>salary</code> 字段是形如"20k-35k"、"15k-25k·13薪"的字符串。清洗时先用正则拆出上下限与薪资月数，再计算平均值作为后续分析口径。</p>
+<p>关键在于<strong>异常值的处理方式</strong>。机械套用 IQR 或 3σ 规则会把大量真实的高薪岗位误删，因此本项目采用<strong>按业务含义分类</strong>的处理策略：</p>
+<table><colgroup><col style="width:14.9%"><col style="width:34.3%"><col style="width:38.0%"><col style="width:12.8%"></colgroup><thead><tr><th>异常类型</th><th>判定规则</th><th>业务含义</th><th>处理</th></tr></thead><tbody>
+<tr><td>无法解析</td><td>正则不匹配</td><td>字段格式异常</td><td>剔除</td></tr>
+<tr><td>上限小于下限</td><td>max 小于 min</td><td>明显录入错误</td><td>剔除</td></tr>
+<tr><td>疑似年薪误填</td><td>min ≥ 100</td><td>月薪不可能达 10 万以上，应为年薪</td><td>剔除</td></tr>
+<tr><td>区间跨度过大</td><td>max ÷ min 超过 8 倍</td><td>上下限可能单位不一致</td><td>保留但打标</td></tr>
+<tr><td>低薪可疑岗</td><td>avg 不足 3 K</td><td>疑似虚假招聘或实习岗混杂</td><td>保留但打标</td></tr>
+</tbody></table>
+<p>这套规则剔除了 15 条记录（占 0.07%），并为后续做敏感性检验留下了对比组——被"保留但打标"的记录在 D1 检验中会被加回去重新计算，用来验证结论是否稳健。</p>
+<h3 id="34-步骤三去重本数据最大的一个坑">3.4 步骤三：去重——本数据最大的一个坑</h3>
+<p>按 <code>positionId</code> 去重时删除了 <strong>6,580 行，占原始数据的 30.9%</strong>。这个比例高得反常，必须验证删除是否正确，否则可能误删真实数据。</p>
+<p>验证做了两步：</p>
+<ol><li><strong>跨城市重复检验</strong>：3,568 个重复的 positionId 组中，同一 positionId 出现在不同城市的组数为 <strong>0</strong>。说明不是不同城市发布了同名岗位，而是同一岗位被重复采集。</li><li><strong>组内薪资一致性检验</strong>：重复组内部各条的薪资<strong>100% 相同</strong>。</li></ol>
+<p>两条证据都指向同一个结论：这是同一岗位的多次抓取记录，而非真实的多条招聘需求。去重保留 <code>createTime</code> 最新的一条，删除操作合理。</p>
+<p>如果不做这个验证，直接删掉 31% 的数据，会是一个经不起追问的操作。而如果不去重，重复岗位会让所有"岗位数量"类统计失真，尤其是城市岗位数排名。</p>
+<h3 id="35-步骤四缺失值分级处理">3.5 步骤四：缺失值分级处理</h3>
+<p>缺失值按"是否影响核心结论"分三级处理，而不是一律填充或一律删除：</p>
+<table><colgroup><col style="width:10.7%"><col style="width:55.0%"><col style="width:11.8%"><col style="width:22.5%"></colgroup><thead><tr><th>级别</th><th>字段</th><th>处理方式</th><th>理由</th></tr></thead><tbody>
+<tr><td>关键字段</td><td>salary、city、education、workYear、positionName</td><td>有缺失即剔除</td><td>缺失则无法参与任何分组分析</td></tr>
+<tr><td>描述字段</td><td>companySize、financeStage、industryField</td><td>填充为"未知"</td><td>仅作辅助维度，填充后可保留样本</td></tr>
+<tr><td>文本字段</td><td>positionDetail</td><td>保留空值</td><td>技能抽取时按"未命中"处理</td></tr>
+</tbody></table>
+<p>实际执行后，关键字段缺失的记录数为 0——说明该数据集在这些核心字段上完整性较好。182 条企业规模为"未知"的记录被保留，并在分析中单独成组（该组薪资中位数 33.2 K，明显偏高，很可能是大厂未标注规模，属于需要在解读时剔除的干扰项）。</p>
+<h3 id="36-步骤五类型转换与有序分类">3.6 步骤五：类型转换与有序分类</h3>
+<p>三个字段需要从字符串转为<strong>有序分类变量</strong>（<code>pd.Categorical(ordered=True)</code>），否则分组统计会按字符串字典序排列，导致"10年以上"排在"1-3年"前面这类错误：</p>
+<ul><li><strong>学历</strong>：不限 → 大专 → 本科 → 硕士 → 博士</li><li><strong>经验</strong>：在校/应届 → 1年以下 → 1-3年 → 3-5年 → 5-10年 → 10年以上 → 不限</li><li><strong>公司规模</strong>：少于15人 → 15-50人 → 50-150人 → 150-500人 → 500-2000人 → 2000人以上</li></ul>
+<p>同时把 <code>createTime</code> 转为 datetime 类型，用于确认数据的时间跨度。</p>
+<h3 id="37-步骤六衍生字段构造">3.7 步骤六：衍生字段构造</h3>
+<p>这是把原始字段转化为分析变量的关键一步，共构造四类衍生字段：</p>
+<p><strong>（1）岗位方向归类</strong></p>
+<p>基于 <code>positionName</code> 与 <code>category</code> 做关键词映射，归为 8 个方向：后端开发、前端开发、移动开发、测试、运维、人工智能、大数据开发/数仓、数据挖掘/算法。同时用 <code>is_bigdata</code> 布尔字段标记大数据相关岗位（582 条）。</p>
+<p><strong>（2）城市等级划分</strong></p>
+<p>按一线（北上广深）、新一线（成都、杭州、武汉、南京、苏州、西安、长沙、重庆等）、二线、其他四档归类，用于后续控制城市这个混淆变量。</p>
+<p><strong>（3）技能标签抽取</strong></p>
+<p>这是技术上最需要小心的一步。技能词典包含 18 个技能（Hadoop、Hive、Spark、Flink、HBase、Kafka、Yarn、MapReduce、Zookeeper、ClickHouse、SQL、MySQL、Oracle、Redis、Java、Python、Scala、Shell、Linux、ETL、数据仓库）。</p>
+<p>朴素做法是 <code>if "SQL" in text</code>，但这会把 <strong>MySQL 误判为 SQL</strong>——而 MySQL 的 12.6% 命中率里绝大部分会被错误计入 SQL。正确做法是对英文字符技能使用<strong>非字母边界正则</strong>：</p>
+<pre><code>def has_skill(text, skill):
+    if skill.isascii():
+        # 前后不能紧跟其他字母，避免 SQL 命中 MySQL、Hive 命中 archive
+        return re.search(r"(?&lt;![A-Za-z])" + re.escape(skill) + r"(?![A-Za-z])", text, re.I) is not None
+    return skill in text  # 中文技能词直接子串匹配</code></pre>
+<p>这个细节直接影响了结论二的可信度：修正后 SQL 在大数据岗的命中率是 34.1%，全体技术岗 9.1%，差值 +25.0 pp；如果不做边界处理，SQL 会被高估到接近 MySQL 的水平，差值失真。</p>
+<p>另外，技能列最终以 <code>int8</code>（0/1）而非布尔类型存储，原因是 CSV 回读后布尔列会变成字符串，导致后续 <code>sum()</code> 报类型错误。这是踩过坑之后的处理。</p>
+<p><strong>（4）薪资质量标记</strong></p>
+<p>在 3.3 中打上的 <code>salary_flag</code> 与 <code>low_salary</code> 标记保留在数据集中，供敏感性检验使用。</p>
+<h3 id="38-清洗质量校验三项检验">3.8 清洗质量校验：三项检验</h3>
+<p>清洗完成后做了三项检验，用来证明后续结论不是清洗过程的副产品：</p>
+<table><colgroup><col style="width:10.6%"><col style="width:21.4%"><col style="width:41.9%"><col style="width:26.1%"></colgroup><thead><tr><th>检验</th><th>方法</th><th>结果</th><th>结论</th></tr></thead><tbody>
+<tr><td>异常值敏感性</td><td>剔除异常 vs 加回异常，两套口径对比</td><td>中位数完全一致（全体 18.5 K、大数据 22.5 K），均值仅变化 0.03 K</td><td>结论不受异常值影响，且说明异常记录占比不足 1%</td></tr>
+<tr><td>城市排名稳定性</td><td>两套口径下重算 Top8 城市薪资</td><td>排名顺序完全一致</td><td>城市对比结论可靠</td></tr>
+<tr><td>样本结构检验</td><td>统计各类别记录数分布</td><td>33% 类别记录数 ≥ 400 且集中在 440–450</td><td>已识别封顶采样偏差，限定结论适用范围</td></tr>
+</tbody></table>
+<p>第一项检验是回答面试官"你删异常值会不会影响结果"的标准答法——<strong>做两套口径跑一遍，用数据回答，而不是口头保证"影响不大"</strong>。</p>
+<h2 id="4-探索性数据分析">4 探索性数据分析</h2>
+<p>分析分四层推进：先看样本长什么样，再做分组对比，然后用交叉分析排除混淆变量，最后检验结论的稳健性。四张图表分别对应四个必须做对的求职决策。</p>
+<h3 id="41-分析框架">4.1 分析框架</h3>
+<p>分析分为四层，由浅入深，每一层都回答一个具体问题：</p>
+<table><colgroup><col style="width:28.8%"><col style="width:44.5%"><col style="width:26.7%"></colgroup><thead><tr><th>层次</th><th>内容</th><th>回答的问题</th></tr></thead><tbody>
+<tr><td>A 层：样本概况</td><td>描述统计、分布结构</td><td>这份数据长什么样</td></tr>
+<tr><td>B 层：分组对比</td><td>方向、技能、城市、学历四个维度的分组统计</td><td>差异在哪里</td></tr>
+<tr><td>C 层：交叉分析</td><td>经验×学历、城市×学历、规模×薪资</td><td>差异是否由其他因素造成</td></tr>
+<tr><td>D 层：稳健性与偏差检验</td><td>敏感性检验、样本结构检验</td><td>结论能不能站得住</td></tr>
+</tbody></table>
+<p>C 层和 D 层是整个分析的骨架。如果只做 A、B 两层，得到的是一堆好看的图表；加上 C 层才能排除混淆变量，加上 D 层才能知道结论的边界在哪。</p>
+<h3 id="42-样本概况">4.2 样本概况</h3>
+<p>14,725 条技术岗记录，覆盖 179 座城市、6,700 家企业，薪资中位数 18.5 K/月、均值 21.3 K/月。</p>
+<p><strong>均值高于中位数 2.8 K</strong>，说明薪资分布右偏——少数高薪岗拉高了均值。这决定了全文所有分组比较<strong>一律使用中位数</strong>，不使用均值。分位数进一步说明了离散程度：P10 为 8.5 K，P90 为 37.5 K，相差 4.4 倍。技术岗的薪资离散度极大，只报平均值会掩盖这个事实。</p>
+<p>样本结构上有三个特征值得注意：</p>
+<ul><li><strong>城市高度集中</strong>：北京（17.7%）、深圳（15.9%）、上海（15.7%）、广州（7.9%）、杭州（5.9%）五城合计占 63.4%，其余 174 座城市瓜分剩余 36.6%。</li><li><strong>学历门槛集中在本科</strong>：本科 74.0%，大专 16.9%，硕士 5.8%，学历不限 3.0%，博士 0.3%。</li><li><strong>经验要求集中在 3–5 年</strong>：3–5 年占 39.7%，1–3 年占 24.2%，而面向在校/应届的仅 3.5%。</li></ul>
+<p>最后一条已经预示了后面漏斗图的结果：应届生真正能投的岗位本来就少，而大数据方向在这个本就很小的池子里占比更低。</p>
+<h3 id="43-图-1各技术方向的月薪分布">4.3 图 1：各技术方向的月薪分布</h3>
+<figure><img src="images/fig1_salary_box.png" alt="图1 各技术方向月薪分布箱线图"><figcaption>图1 各技术方向月薪分布箱线图</figcaption></figure>
+<p><strong>图表类型</strong>：箱线图（含离群点与均值标记）</p>
+<p><strong>X 轴</strong>：岗位方向，按薪资中位数排序</p>
+<p><strong>Y 轴</strong>：月薪（K/月），上限截断至 70 K 以保证可读性</p>
+<p><strong>为什么用箱线图而不是柱状图</strong>：薪资是右偏分布，柱状图只能画均值，会被少数高薪岗拉偏。箱线图能同时呈现中位数、中间 50% 的区间（箱体）、整体跨度（须线）和离群值，信息密度更高，也更接近求职者的真实体感。</p>
+<p><strong>读图要点</strong>：</p>
+<ul><li>大数据开发/数仓的薪资中位数为 <strong>22.5 K</strong>，高于后端开发的 19.0 K 和运维的 15.0 K，但低于人工智能的 30.0 K。</li><li><strong>箱体高度比中位数更值得看</strong>。大数据岗的中间 50% 集中在 15.6 K–30.0 K，箱体相对紧凑，说明这个方向的薪资更集中、更可预期；后端开发的箱体从 12.5 K 拉到 26.0 K，离散度更大，意味着同样的岗位在不同公司待遇差别悬殊。</li><li>人工智能方向中位数最高（30.0 K），但它不是专科生的现实选项——下一节和学历分析会说明原因。</li></ul>
+<p><strong>面试追问预演</strong>：</p>
+<blockquote>问：为什么大数据比人工智能低，你还建议选大数据？ 答：因为选方向不是选薪资最高的，是选自己进得去的。人工智能岗 1,351 个，大数据岗 582 个，但人工智能岗对学历的要求几乎全部是本科以上；大数据岗里还有 5% 是大专可投。我要比较的不是"哪个方向天花板高"，而是"哪个方向我能真正拿到 offer"。</blockquote>
+<h3 id="44-图-2哪些技能是大数据岗的专属门槛">4.4 图 2：哪些技能是大数据岗的"专属门槛"</h3>
+<figure><img src="images/fig2_skill_gap.png" alt="图2 大数据岗与全体技术岗的技能命中率对比"><figcaption>图2 大数据岗与全体技术岗的技能命中率对比</figcaption></figure>
+<p><strong>图表类型</strong>：横向分组条形图</p>
+<p><strong>X 轴</strong>：岗位要求该技能的占比（%）</p>
+<p><strong>Y 轴</strong>：技能名称，按"大数据岗命中率 − 全体技术岗命中率"的差值降序排列</p>
+<p><strong>为什么不用词云</strong>：词云只能看相对频率，看不出一个技能是不是大数据岗<strong>专属</strong>的。判断学习优先级，需要的是<strong>区分度</strong>而不是<strong>出现频次</strong>。所以这张图做了对照组：用大数据岗的命中率减去全体技术岗的命中率，差值（pp）才是真正的区分指标。</p>
+<p><strong>关键读数</strong>：</p>
+<table><colgroup><col style="width:25.1%"><col style="width:21.5%"><col style="width:21.5%"><col style="width:32.0%"></colgroup><thead><tr><th>技能</th><th>大数据岗</th><th>全体技术岗</th><th>差值</th></tr></thead><tbody>
+<tr><td>Hive</td><td>40.0%</td><td>2.1%</td><td>+37.9 pp</td></tr>
+<tr><td>Spark</td><td>40.4%</td><td>2.7%</td><td>+37.7 pp</td></tr>
+<tr><td>数据仓库</td><td>39.3%</td><td>1.9%</td><td>+37.5 pp</td></tr>
+<tr><td>Hadoop</td><td>37.8%</td><td>2.4%</td><td>+35.4 pp</td></tr>
+<tr><td>Flink</td><td>30.0%</td><td>1.6%</td><td>+28.4 pp</td></tr>
+<tr><td>SQL</td><td>34.1%</td><td>9.1%</td><td>+25.0 pp</td></tr>
+<tr><td>Linux</td><td>15.8%</td><td>15.9%</td><td>−0.1 pp</td></tr>
+</tbody></table>
+<p>前四名的差值都在 +35 pp 以上，它们是这条赛道的<strong>入场券</strong>——不具备基本进不了面试。</p>
+<p>最有信息量的是最后一行：Linux 在大数据岗是 15.8%，在全体技术岗是 15.9%，差值几乎为零。这说明 <strong>Linux 不是加分项，是及格线</strong>。会 Linux 不会给你任何差异化优势，但不会会被直接筛掉——这类技能值得学，但不值得花大力气做项目包装。</p>
+<p><strong>技能组合比单个技能更重要</strong>。单技能的稀缺性有限，企业真正要的是组合能力：Hive + Spark 同时出现于 30.2% 的大数据岗，Hadoop + Spark 占 28.4%，Hadoop + Hive 占 25.3%，Flink + Spark 占 23.7%。这意味着学习路线应该按组合规划——目标是能跑通一条完整链路，而不是把技能一个个单独学完。</p>
+<h3 id="45-图-3薪资与学历门槛的城市权衡">4.5 图 3：薪资与学历门槛的城市权衡</h3>
+<figure><img src="images/fig3_city_bubble.png" alt="图3 城市薪资中位数与大专可投率气泡图"><figcaption>图3 城市薪资中位数与大专可投率气泡图</figcaption></figure>
+<p><strong>图表类型</strong>：气泡散点图</p>
+<p><strong>X 轴</strong>：大专/学历不限岗位占比（%）——代表学历门槛的宽松程度</p>
+<p><strong>Y 轴</strong>：薪资中位数（K/月）</p>
+<p><strong>气泡面积</strong>：该城市岗位数量（机会量）</p>
+<p><strong>过滤条件</strong>：仅保留样本量 ≥ 50 的城市</p>
+<p><strong>为什么要过滤样本量</strong>：不过滤的话，三亚、鸡西这类只有一两条记录的城市会因为个别高薪岗直接冲到薪资榜首（三亚 45 K、鸡西 30 K），得出完全错误的城市排名。这是城市分析里最常见的错误，也是这张图必须写明的处理。</p>
+<p><strong>读图要点</strong>：</p>
+<p>图中右上角（高薪 + 低门槛）是理想区，但<strong>没有任何城市落在那里</strong>。现实是一条明显的负相关曲线——薪资越高的城市，学历门槛越严。</p>
+<ul><li><strong>北京</strong>：薪资中位数 27.5 K 最高，但大专可投仅 8.8%，是全部城市中最低的。高薪是用学历门槛换来的。</li><li><strong>广州 / 成都 / 武汉</strong>：薪资中位数都是 15.0 K，大专可投分别为 28.1%、23.6%、22.4%，是北京的 2.5–3 倍；大数据岗数量分别为 40、31、18 个。这是"门槛低、薪资居中、方向匹配"的区域。</li><li><strong>东莞</strong>：大专可投高达 45.1%，但薪资只有 12.8 K，且大数据岗仅 1 个——门槛最低但方向不匹配，不适合作为起点。</li><li><strong>杭州</strong>：薪资 20.0 K 而大专可投 11.6%，是典型的高薪高门槛城市。</li></ul>
+<p><strong>城市等级视角</strong>进一步验证了这个梯度关系：</p>
+<table><colgroup><col style="width:15.7%"><col style="width:40.0%"><col style="width:22.2%"><col style="width:22.2%"></colgroup><thead><tr><th>城市等级</th><th>岗位数</th><th>薪资中位数</th><th>大专可投占比</th></tr></thead><tbody>
+<tr><td>一线</td><td>8,231（57.1%）</td><td>22.5 K</td><td>16.1%</td></tr>
+<tr><td>新一线</td><td>4,577（31.7%）</td><td>15.0 K</td><td>21.4%</td></tr>
+<tr><td>二线</td><td>1,161（8.1%）</td><td>12.5 K</td><td>30.3%</td></tr>
+<tr><td>其他</td><td>453（3.1%）</td><td>8.5 K</td><td>44.8%</td></tr>
+</tbody></table>
+<p>薪资与门槛的梯度完全一致：城市等级每降一档，薪资中位数下降 5–7 K，大专可投占比上升 5–14 pp。</p>
+<h3 id="46-图-4三重条件叠加后还剩多少机会">4.6 图 4：三重条件叠加后，还剩多少机会</h3>
+<figure><img src="images/fig4_funnel.png" alt="图4 学历、方向、经验三重条件筛选漏斗"><figcaption>图4 学历、方向、经验三重条件筛选漏斗</figcaption></figure>
+<p><strong>图表类型</strong>：漏斗图</p>
+<p><strong>每一级</strong>：在前一级基础上再叠加一个条件后的剩余岗位数，条形宽度按数量等比例</p>
+<p><strong>口径说明</strong>："应届可投"取<strong>宽口径</strong>，即经验要求为"经验不限"或"在校/应届"。因为"经验不限"的岗位应届生同样可以投递，只算"在校/应届"会严重低估机会量。</p>
+<p><strong>读图要点</strong>：</p>
+<table><colgroup><col style="width:53.5%"><col style="width:23.2%"><col style="width:23.2%"></colgroup><thead><tr><th>筛选层级</th><th>剩余岗位数</th><th>占全部技术岗</th></tr></thead><tbody>
+<tr><td>全部技术岗</td><td>14,422</td><td>100%</td></tr>
+<tr><td>学历门槛可通过（大专/学历不限）</td><td>2,865</td><td>19.9%</td></tr>
+<tr><td>其中属于大数据方向</td><td>39</td><td>0.27%</td></tr>
+<tr><td>且应届可投</td><td>5</td><td>0.03%</td></tr>
+</tbody></table>
+<p>三道筛子之后只剩 5 个岗位。如果换成严格口径（只算明确写"在校/应届/1 年以下"的），这个数字是 <strong>0</strong>。</p>
+<p><strong>这张图的正确解读方式</strong>：</p>
+<p>它<strong>不</strong>说明大数据方向不该选，而是精确地说明了<strong>卡点在哪一道筛子上</strong>。看两级之间掉多少：</p>
+<ul><li>学历这一道筛掉了 80.1%——这是最大的门槛。</li><li>方向这一道从 2,865 掉到 39——说明在专科可投的岗位里，大数据方向只占 1.4%，机会密度低。</li><li>经验这一道从 39 掉到 5——说明大数据岗普遍要求 1 年以上经验。</li></ul>
+<p>一个关键的对照数据：如果把学历限制放开，只看"面向应届的大数据岗"（不限学历），有 <strong>94 个</strong>；而"专科可投的大数据岗"（不限经验）有 39 个。两个数字说明卡住的主要是<strong>学历</strong>，不是经验。</p>
+<p>这直接指向了策略：既然行业入口是窄的，就从侧门进——先做技能栈相邻的岗位（后端开发 861 个专科可投岗、运维 884 个、测试 349 个），积累 1–2 年真实的数据处理经验，再转数据开发。这条路径比硬投校招大数据岗的成功率高得多。</p>
+<p><strong>面试追问预演</strong>：</p>
+<blockquote>问：只剩 5 个岗位，是不是说明这个分析没有实用价值？ 答：恰恰相反，"只剩 5 个"是整份分析里最有价值的一个数。它把一个模糊的焦虑（"大数据专业好就业吗"）变成了一个可量化的约束（"专科+应届+大数据三重条件下只有 5 个岗位"），从而能推导出明确的行动：不要等校招，走侧门进。如果我只做出"大数据薪资很高"这一层结论，反而会误导自己去硬投。</blockquote>
+<h3 id="47-交叉分析技能溢价的伪相关">4.7 交叉分析：技能溢价的伪相关</h3>
+<p>这是全篇技术上最有含量的一段，也是把结论从"相关"推进到"接近因果"的唯一一步。</p>
+<p><strong>第一步：全样本口径</strong></p>
+<p>直接计算"具备某技能的岗位薪资中位数 − 不具备的岗位薪资中位数"：</p>
+<table><colgroup><col style="width:27.2%"><col style="width:17.6%"><col style="width:17.6%"><col style="width:20.1%"><col style="width:17.6%"></colgroup><thead><tr><th>技能</th><th>具备时中位数</th><th>不具备中位数</th><th>溢价</th><th>溢价率</th></tr></thead><tbody>
+<tr><td>MapReduce</td><td>30.0 K</td><td>18.5 K</td><td>+11.5 K</td><td>+62.2%</td></tr>
+<tr><td>Flink</td><td>25.0 K</td><td>18.5 K</td><td>+6.5 K</td><td>+35.1%</td></tr>
+<tr><td>Spark</td><td>25.0 K</td><td>18.5 K</td><td>+6.5 K</td><td>+35.1%</td></tr>
+<tr><td>ClickHouse</td><td>25.0 K</td><td>18.5 K</td><td>+6.5 K</td><td>+35.1%</td></tr>
+<tr><td>Hadoop</td><td>24.0 K</td><td>18.5 K</td><td>+5.5 K</td><td>+29.7%</td></tr>
+<tr><td>Hive</td><td>22.5 K</td><td>18.5 K</td><td>+4.0 K</td><td>+21.6%</td></tr>
+</tbody></table>
+<p>看起来结论很清晰：会 Spark 薪资高 35%。但这是<strong>原始相关关系</strong>，不是因果——高薪岗要求 Spark，不代表学 Spark 就能涨薪，也可能只是"要求 Spark 的岗位本身层级更高"。</p>
+<p><strong>第二步：控制混淆变量</strong></p>
+<p>把城市等级固定在一线/新一线，经验固定在 1–5 年，只在大数据岗内部比较（n = 333）：</p>
+<table><colgroup><col style="width:42.0%"><col style="width:14.5%"><col style="width:14.5%"><col style="width:14.5%"><col style="width:14.5%"></colgroup><thead><tr><th>技能</th><th>具备时中位数</th><th>不具备中位数</th><th>溢价</th><th>溢价率</th></tr></thead><tbody>
+<tr><td>Kafka</td><td>22.5 K</td><td>20.8 K</td><td>+1.8 K</td><td>+8.4%</td></tr>
+<tr><td>ClickHouse</td><td>23.0 K</td><td>21.5 K</td><td>+1.5 K</td><td>+7.0%</td></tr>
+<tr><td>Python / Flink / Java</td><td>22.5 K</td><td>21.5 K</td><td>+1.0 K</td><td>+4.7%</td></tr>
+<tr><td>HBase</td><td>20.0 K</td><td>22.5 K</td><td>−2.5 K</td><td>−11.1%</td></tr>
+<tr><td>Spark</td><td>20.0 K</td><td>22.5 K</td><td>−2.5 K</td><td>−11.1%</td></tr>
+<tr><td>Hive</td><td>20.0 K</td><td>22.5 K</td><td>−2.5 K</td><td>−11.1%</td></tr>
+</tbody></table>
+<p>结论反转：<strong>Spark 的溢价从 +6.5 K（+35.1%）变成 −2.5 K（−11.1%）</strong>。</p>
+<p><strong>这个反转说明什么</strong>：全样本里的那 35% 溢价，来源不是"Spark 技能稀缺"，而是"要求 Spark 的岗位恰好是数据开发岗，而数据开发岗本身薪资更高"。在数据开发岗内部，Spark 是标配，会它不加分，不会它进不去。</p>
+<p><strong>这个发现直接改变了结论二的表述</strong>：学 Spark 的目的是<strong>获得入场资格</strong>，而不是<strong>获得议价能力</strong>。在简历上写"精通 Spark"没什么用，写"我用 Spark 做过一条日处理 X 亿条的链路"才有用——因为企业买的是解决问题的能力，不是技能名词。</p>
+<p><strong>方法上的收获</strong>：相关不等于因果，而排除混淆变量的方法不是口头声明，是<strong>分层</strong>——把可能的混杂因素（城市、工龄、方向）固定住，再看目标变量的差异是否仍然存在。这套方法可以迁移到任何一个"某特征是否影响某结果"的分析里。</p>
+<h2 id="5-业务结论与项目价值">5 业务结论与项目价值</h2>
+<p>四条结论，每条都给出数据依据和具体做法。这是整个项目真正要交付的东西——不是"大数据行业前景广阔"，而是"下个月我该学什么、投哪个城市的哪些岗位"。</p>
+<h3 id="51-结论一方向值得选但不要把它当成第一份工作">5.1 结论一：方向值得选，但不要把它当成第一份工作</h3>
+<p><strong>数据依据</strong>：大数据岗薪资中位数 22.5 K，比后端开发高 3.5 K、比运维高 7.5 K，方向选择的回报是明确的。但 577 个有薪资记录的大数据岗中，"大专学历 + 应届可投"的只有 5 个，严格口径为 0 个。</p>
+<p><strong>具体做法</strong>：毕业当年的投递清单里，把"大数据开发工程师"换成三个更容易命中的岗位——</p>
+<ol><li><strong>数据运维 / ETL 工程师</strong>：运维方向有 884 个专科可投岗（薪资中位数 9.2 K），ETL 在大数据岗的技能要求中占 23.4%，技能栈重叠度最高。</li><li><strong>后端开发（Java / Python）</strong>：861 个专科可投岗（12.5 K），而大数据岗要求 Java 36.6%、Python 35.9%，是转入数据开发最自然的跳板。</li><li><strong>带大数据方向的测试开发</strong>：349 个专科可投岗（10.5 K），门槛最低，适合作为入行第一站。</li></ol>
+<p>这三个岗位的共同点是：技能栈与数据开发高度重叠，1–2 年后带着真实的数据处理经验转岗，比现在硬投校招大数据岗现实得多。</p>
+<h3 id="52-结论二技能按组合学不要按清单堆">5.2 结论二：技能按"组合"学，不要按"清单"堆</h3>
+<p><strong>数据依据</strong>：大数据岗的技能要求排名为 Spark 40.4%、Hive 40.0%、数据仓库 39.3%、Hadoop 37.8%，四者的差值都在 +35 pp 以上；Flink 为 30.0%，优先级低于前四者；Linux 差值 −0.1 pp，属于及格线。技能组合方面，Hive + Spark 共现率 30.2%，是最常见的组合。</p>
+<p><strong>具体做法</strong>：学习顺序按"命中率 × 区分度"排——</p>
+<blockquote>SQL（34.1%，差值 +25.0 pp）→ Hive（40.0%，+37.9 pp）→ Spark（40.4%，+37.7 pp）→ Hadoop（37.8%，+35.4 pp）→ Kafka（21.1%，+18.8 pp）→ Flink（30.0%，+28.4 pp，锦上添花）</blockquote>
+<p>核心目标不是"学完 6 个技能"，而是<strong>能独立跑通一条「Hive 建仓 → Spark 计算 → 结果落库」的完整链路</strong>，并且能在简历上写清这条链路的数据量、处理时长和遇到的问题。因为 30.2% 的岗位同时要求 Hive 与 Spark，这个组合本身就是一条完整的岗位画像。</p>
+<p>同时明确不投入过多精力的部分：Linux、MySQL 是及格线，会了不加分，但不会会被筛掉——保证够用即可，不必做深度项目。</p>
+<h3 id="53-结论三城市优先级为广州-成都-武汉-北京">5.3 结论三：城市优先级为广州 ≈ 成都 &gt; 武汉 &gt; 北京</h3>
+<p><strong>数据依据</strong>：</p>
+<table><colgroup><col style="width:12.1%"><col style="width:30.8%"><col style="width:30.8%"><col style="width:26.4%"></colgroup><thead><tr><th>城市</th><th>薪资中位数</th><th>大专可投占比</th><th>大数据岗数</th></tr></thead><tbody>
+<tr><td>北京</td><td>27.5 K</td><td>8.8%</td><td>145</td></tr>
+<tr><td>上海</td><td>22.5 K</td><td>13.6%</td><td>96</td></tr>
+<tr><td>深圳</td><td>21.0 K</td><td>20.9%</td><td>103</td></tr>
+<tr><td>杭州</td><td>20.0 K</td><td>11.6%</td><td>42</td></tr>
+<tr><td>广州</td><td>15.0 K</td><td>28.1%</td><td>40</td></tr>
+<tr><td>成都</td><td>15.0 K</td><td>23.6%</td><td>31</td></tr>
+<tr><td>武汉</td><td>15.0 K</td><td>22.4%</td><td>18</td></tr>
+</tbody></table>
+<p><strong>具体做法</strong>：以专科身份投递时，把广州、成都、武汉作为主战场——学历门槛降到北京的 2.5–3 倍宽松，薪资只低 5–7 K，且大数据岗数量足够形成有效投递量。</p>
+<p>北京、上海、深圳作为"专升本之后"或"攒够 2 年经验"的阶段目标，而不是起点。东莞、郑州这类城市虽然门槛最低（大专可投 45.1%、30.4%），但大数据岗分别只有 1 个和 9 个，方向不匹配，不适合作为职业生涯的起点。</p>
+<p>一个补充数据支撑这个选择：一线城市的大专岗薪资中位数是 13.5 K，二线城市的本科岗是 13.0 K——<strong>在一线城市以专科身份拿到的薪资，和二线城市以本科身份拿到的基本持平</strong>。但一线城市的大数据岗数量是新一线的 3–5 倍，机会密度完全不同。所以在"去哪座城市"这个问题上，一线城市仍然值得去，只是要靠降低岗位期望（而不是降低城市等级）来换取入场机会。</p>
+<h3 id="54-结论四别用我会-spark去谈薪它不构成溢价">5.4 结论四：别用"我会 Spark"去谈薪，它不构成溢价</h3>
+<p><strong>数据依据</strong>：全样本口径下，要求 Spark 的岗位薪资高出 6.5 K（+35.1%）；把城市等级固定在一线/新一线、经验固定在 1–5 年、只在大数据岗内部比较后，这个差值变成 −2.5 K（−11.1%）。之前的溢价来自岗位方向本身，而不是技能稀缺性。</p>
+<p><strong>具体做法</strong>：</p>
+<ol><li><strong>简历上不要写技能名词，要写能力和结果</strong>。"熟悉 Spark"改成"用 Spark 处理过 X 亿条日志，把报表产出时间从 4 小时压到 25 分钟"。</li><li><strong>谈薪时的议价筹码是"能解决什么问题"，不是"会用什么工具"</strong>。数据开发岗里 Spark 是标配，企业不会为一个标配技能付溢价；会为"能独立把一条链路从 0 搭起来并跑稳"付溢价。</li><li><strong>技能投入的优先级要根据"是否构成区分度"来排</strong>，而不是根据"薪资溢价排名"。因为溢价排名里混入了方向选择和岗位层级的干扰，看差值（大数据岗 vs 全体岗）才准确。</li></ol>
+<h3 id="55-项目价值">5.5 项目价值</h3>
+<p><strong>对个人求职的直接价值</strong>：</p>
+<ul><li>拿到了一份有数据支撑的投递清单：3 个切入岗位、3 座主战场城市、6 个技能的学习顺序。</li><li>简历上有了一个可以展开讲 20 分钟的项目，且每一层结论都有数字支撑、有对照组、有限定条件。</li><li>面试中"你怎么排除其他因素""你的数据有什么问题"这两个高频追问，都有准备好的答案（分层控制、封顶采样识别、敏感性检验）。</li></ul>
+<p><strong>方法论层面的可复用价值</strong>：</p>
+<p>项目里真正可迁移的不是 pandas 语法，而是四个判断习惯——</p>
+<ol><li><strong>先检验数据本身，再分析数据</strong>。封顶采样的发现直接限制了所有占比结论的表述方式，这是数据分析中最容易被忽略的前置步骤。</li><li><strong>相关结论必须做一次分层验证</strong>。Spark 溢价从 +35% 反转到 −11%，这个反转让整份分析的可信度提升了一个量级。</li><li><strong>删数据之前先证明该删</strong>。去重删掉 31% 的数据，先验证了跨城市重复为 0、组内薪资 100% 一致，才动手。</li><li><strong>对样本量设门槛</strong>。城市排名必须过滤样本量不足 50 条的城市，否则三亚、鸡西会冲到榜首。</li></ol>
+<p><strong>对招聘方的展示价值</strong>：这个项目展示的不只是"会用 pandas 做分组统计"，而是"知道一个分析结论在什么条件下成立、在什么条件下不成立"。后者是初级分析师和中级分析师的分界线。</p>
+<h2 id="6-项目总结局限性后续可优化方向">6 项目总结、局限性、后续可优化方向</h2>
+<p>本章回顾做完这个项目真正学到的东西，如实列出八项局限，并给出四个可以继续推进的方向。</p>
+<h3 id="61-项目总结">6.1 项目总结</h3>
+<p>项目从 21,320 条原始招聘记录出发，经 8 步清洗得到 14,725 条有效样本，通过描述统计、分组对比、交叉分析和稳健性检验四层分析，最终输出了 4 条面向专科应届生的可执行求职结论。</p>
+<p>技术上完成的工作包括：富文本标签清洗、字符串薪资结构化、按业务语义分类的异常值处理、基于多字段证据的去重验证、有序分类变量转换、18 个技能标签的边界正则抽取、分层控制混淆变量、掩码处理小样本单元格、两套口径的敏感性检验。</p>
+<p>认知上最大的收获是两件事：</p>
+<p><strong>第一，数据的"形状"比数据本身更重要。</strong> 如果没做样本结构检验，我会直接报出"Java 岗占 34.4%、Perl 岗占 0.9%"这样的占比结论，而这个结论是完全错误的——那份数据里 Java 和 Perl 几乎一样多。识别出"按类别封顶采样"之后，整份报告的表述方式都必须改变。这件事让我意识到，分析的第一步不是 <code>df.describe()</code>，而是先问"这份数据是怎么来的"。</p>
+<p><strong>第二，能反驳自己的结论，结论才有价值。</strong> Spark 溢价的分析如果只停在全样本口径，我会得出"学 Spark 能涨薪 35%"这个听起来很有说服力、但完全错误的结论。多花一步做分层控制，得到的 −11.1% 反而是整个项目里最有信息量的数字——它把"技能"和"方向"这两件被混在一起的事拆开了。</p>
+<h3 id="62-局限性">6.2 局限性</h3>
+<p>如实列出八项局限，每一项都说明了它对结论的影响范围：</p>
+<table><colgroup><col style="width:10.1%"><col style="width:34.0%"><col style="width:26.8%"><col style="width:29.0%"></colgroup><thead><tr><th>序号</th><th>局限性</th><th>对结论的影响</th><th>当前处理方式</th></tr></thead><tbody>
+<tr><td>1</td><td><strong>按类别封顶采样</strong>：70 类中 33% 的记录数 ≥ 400 且集中在 440–450</td><td>所有"某类岗位占比"的结论不成立</td><td>全文占比均表述为"样本内占比"，并在第 2.3 节前置声明</td></tr>
+<tr><td>2</td><td><strong>单一平台来源</strong>：仅拉勾网，偏向互联网/科技行业</td><td>对传统行业、国企的数据岗覆盖不足</td><td>结论限定为"互联网及科技行业招聘市场"</td></tr>
+<tr><td>3</td><td><strong>时间窗口为 2022.08–2024.01</strong></td><td>2024 年之后的技术趋势（如湖仓一体、AI 辅助开发）未覆盖</td><td>结论标注时间范围，定位为"历史基线"</td></tr>
+<tr><td>4</td><td><strong>薪资为挂牌值而非实发值</strong></td><td>名义薪资通常高于实际到手</td><td>只做横向比较，不做绝对收入预测</td></tr>
+<tr><td>5</td><td><strong>薪资区间按上下限均值计算</strong></td><td>与真实offer有偏差</td><td>统一口径，保证组间可比</td></tr>
+<tr><td>6</td><td><strong>技能靠关键词匹配抽取</strong></td><td>语义等价表述（如"离线计算"未识别为 Spark）会漏检</td><td>用非字母边界正则消除假阳性，漏检导致的是<strong>低估</strong>而非高估，不影响相对排序</td></tr>
+<tr><td>7</td><td><strong>未覆盖"软技能"与项目经验要求</strong></td><td>无法评估沟通能力、业务理解的权重</td><td>明确列为不在分析范围内</td></tr>
+<tr><td>8</td><td><strong>样本量小的交叉单元格</strong></td><td>个别组合（如博士×10年以上）不可靠</td><td>单元格样本量不足 10 条时置空，不做结论</td></tr>
+</tbody></table>
+<p>其中第 1 项是最需要在面试中主动说明的——它是这份数据最根本的偏差，也是最容易被追问倒的地方。主动说出来，比被问出来要好。</p>
+<h3 id="63-后续可优化方向">6.3 后续可优化方向</h3>
+<p>按投入产出比排序，四个方向：</p>
+<p><strong>（1）补采多平台数据，修正样本偏差</strong></p>
+<p>当前数据的最大问题是单一平台 + 封顶采样。可行的改进是增加 BOSS 直聘、猎聘等平台的公开数据，做跨平台交叉验证。如果两个平台的"大数据岗技能要求排序"一致，结论的可信度会显著提升；如果不一致，那本身就是有价值的发现。</p>
+<p><strong>（2）用 TF-IDF 或轻量 NLP 替代关键词匹配</strong></p>
+<p>当前技能抽取依赖人工词典 + 正则，优点是透明可解释，缺点是无法发现词典外的新技能（如数据湖、湖仓一体、Iceberg）。改进方式是对职位描述做 TF-IDF，提取高频未登录词，用无监督方法发现新兴技能词，再与原词典合并。</p>
+<p><strong>（3）把"经验要求"做成生存分析</strong></p>
+<p>当前只统计了各经验段的岗位数量和薪资，没有回答"从 1–3 年跨到 3–5 年，薪资涨幅是多少、需要多久"。如果能引入时间序列或生存分析视角，可以给出更精准的职业路径规划——例如"做 2 年数据运维转数据开发，薪资能从 9.2 K 涨到 22.5 K"这类有说服力的路径预测。</p>
+<p><strong>（4）做成可交互的查询工具</strong></p>
+<p>当前结论是静态的。如果做成一个可交互页面（选择城市 + 学历 + 经验，输出匹配的岗位方向、技能清单和薪资区间），它的实用价值会从"一份报告"升级为"一个工具"。技术上可以用 Streamlit 或轻量前端实现，也是作品集的一个加分项。</p>
+<h3 id="64-复现说明">6.4 复现说明</h3>
+<p>项目全部代码与中间产物均可复现，目录结构如下：</p>
+<table><colgroup><col style="width:32.9%"><col style="width:67.1%"></colgroup><thead><tr><th>文件</th><th>内容</th></tr></thead><tbody>
+<tr><td>01_data_cleaning.py</td><td>8 步清洗流程，输出 clean_jobs.csv 与 cleaning_log.txt</td></tr>
+<tr><td>02_eda_analysis.py</td><td>4 层 20 张分析表，输出 eda_results.txt</td></tr>
+<tr><td>03_charts_data.py</td><td>计算 4 张图表的精确坐标，输出 charts_data.json</td></tr>
+<tr><td>03_visualization.py</td><td>matplotlib 绘图脚本（含中文字体配置）</td></tr>
+<tr><td>clean_jobs.csv</td><td>清洗后数据集，14,725 行 × 59 列</td></tr>
+</tbody></table>
+<p>运行环境为 Python 3 + pandas + NumPy + matplotlib。所有结论数字均可在 <code>eda_results.txt</code> 中逐条核对。</p>
+<hr>
+<h2 id="附录如何复现">附录：如何复现</h2>
+<pre><code># 1. 准备数据：从和鲸社区下载《拉勾招聘》数据集，放到 data/ 目录
+#    （仓库不托管原始数据，见 data/README.md）
+
+# 2. 安装依赖
+pip install pandas numpy matplotlib
+
+# 3. 按顺序执行
+python src/01_data_cleaning.py    # 清洗 → data/clean_jobs.csv + data/cleaning_log.txt
+python src/02_eda_analysis.py     # 探索性分析 → data/eda_results.txt（20 张分析表）
+python src/03_charts_data.py      # 计算图表坐标 → data/charts_data.json
+python src/03_visualization.py    # matplotlib 出图（需中文字体）</code></pre>
+<blockquote>报告中出现的每一个数字，都可以在 <code>data/eda_results.txt</code> 中逐条核对。</blockquote>
+<hr>
+<p align="right"><sub>← 返回 <a href="README.md">README</a></sub></p>
+    <hr>
+    <p style="color:#94a3b8;font-size:14px">本页由 <code>src/build_report_html.py</code> 从 <code>REPORT.md</code> 自动生成。</p>
+  </article>
+</div>
+<div class="foot">
+  数据来源：和鲸社区公开数据集，仅用于学习与研究。
+</div>
+</body>
+</html>
