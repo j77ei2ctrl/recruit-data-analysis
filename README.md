@@ -4,7 +4,7 @@
 
 **用 14,725 条真实招聘数据，算出一条能照着做的求职路径**
 
-[📊 在线作品集](https://your-username.github.io/bigdata-job-analysis/) · [📄 完整项目报告](REPORT.md) · [📖 网页版报告](report.html) · [🎤 面试口述稿](docs/面试口述稿.md) · [❓ 面试问答清单](docs/面试问答清单.md)
+[📊 在线作品集](https://your-username.github.io/bigdata-job-analysis/) · [📄 完整项目报告](REPORT.md) · [📖 网页版报告](report.html))
 
 ![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)
 ![pandas](https://img.shields.io/badge/pandas-2.x-150458?logo=pandas&logoColor=white)
